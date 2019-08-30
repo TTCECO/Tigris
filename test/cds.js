@@ -10,27 +10,27 @@ contract('CDS', function() {
  	var user = '0x48449ccfb77fc86707c9757009ca7be343902e3f';
  	//pk = a9e9cb65e35cf7a52a13b285b3eb54cda5a5a04c6cf47dd18e38637533d10f28
 
-  var initalCLAYReserve = 1000000000 * 10 **18;
+  var initalCLAY = 1000000000 * 10 **18;
 
 	it("get admin ",async () =>  {
-        const reserve = await CDS.deployed();
-        admin = await reserve.admin.call()
+        const cds = await CDS.deployed();
+        admin = await cds.admin.call()
         assert.equal(admin, owner, "equal")
   });
 
   it("admin set operator  ",async () =>  {
-        const reserve = await CDS.deployed();
-        await reserve.addOperator(owner, {from:owner});
-        operator = await reserve.getOperators.call();
+        const cds = await CDS.deployed();
+        await cds.addOperator(owner, {from:owner});
+        operator = await cds.getOperators.call();
         assert.equal(operator[0], owner, "equal");
   });
 
   it("reserve", async () =>{
     	const clay = await CLAY.deployed();
-  		const reserve = await CDS.deployed();
-  		clay.transfer(CLAYReserveAddress,initalCLAYReserve,{from:owner});
+  		const cds = await CDS.deployed();
+  		clay.transfer(CLAYReserveAddress,initalCLAY,{from:owner});
   		var CLAYReserve = await clay.balanceOf.call(CLAYReserveAddress);
-		  assert.equal(CLAYReserve, initalCLAYReserve, "equal")
+		  assert.equal(CLAYReserve, initalCLAY, "equal")
   });	
 
 });
