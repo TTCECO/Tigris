@@ -24,7 +24,7 @@ contract('CFIAT', function() {
         assert.equal(operator[0], owner, "equal");
   });
 
-  it("cusd", async () =>{
+  it("cusd init status", async () =>{
   		const cusd = await CUSD.deployed();
   		var CLAYReserve = await cusd.balanceOf.call(CLAYReserveAddress);
 		  assert.equal(CLAYReserve, initalCUSD, "equal")
