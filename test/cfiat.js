@@ -3,31 +3,48 @@ var CUSD = artifacts.require("./CFIAT.sol");
 contract('CFIAT', function() {
 	var eth = web3.eth;
   var owner = eth.accounts[0];
+  var operator_1 = eth.accounts[1];
+  var user_1 = eth.accounts[2];
+  var usd_value = 99 * 10 **18;
 
-  var CLAYReserveAddress = "0x018043e33dab6434d22c998c43f1dff47fbbccbf";
-  // pk = 52b9b455143c8fbb1a8e9ef3e2452a24bb196c86efc8a44f69fc7ad9ccced823
- 	var user = '0x48449ccfb77fc86707c9757009ca7be343902e3f';
- 	//pk = a9e9cb65e35cf7a52a13b285b3eb54cda5a5a04c6cf47dd18e38637533d10f28
-
-  var initalCUSD = 0 * 10 **18;
-
-	it("get admin ",async () =>  {
+	it("check admin",async () =>  {
         const cusd = await CUSD.deployed();
         admin = await cusd.admin.call()
         assert.equal(admin, owner, "equal")
   });
 
-  it("admin set operator  ",async () =>  {
+  it("admin add operators & check",async () =>  {
         const cusd = await CUSD.deployed();
-        await cusd.addOperator(owner, {from:owner});
-        operator = await cusd.getOperators.call();
-        assert.equal(operator[0], owner, "equal");
+        await cusd.addOperator(operator_1, {from:owner});
+        operators = await cusd.getOperators.call();
+        assert.equal(operators[0], operator_1, "equal");
   });
 
-  it("cusd init status", async () =>{
+  it("check init total supply, should be zero", async () =>{
   		const cusd = await CUSD.deployed();
-  		var CLAYReserve = await cusd.balanceOf.call(CLAYReserveAddress);
-		  assert.equal(CLAYReserve, initalCUSD, "equal")
+  		var totalSupply = await cusd.totalSupply.call();
+		  assert.equal(totalSupply, 0, "equal")
   });	
+
+
+  it("create cusd for address by not operator",function(){
+    return CUSD.deployed().then(function(cusd) {
+        return cusd.create(user_1, usd_value, {from:user_1});
+     }).catch(function(error) {
+        assert(error.toString().includes('Error: VM Exception while processing transaction: revert'), error.toString())
+    });
+
+  });
+
+
+  it("create cusd for address by operator", async () =>{
+      const cusd = await CUSD.deployed();
+      await cusd.create(user_1, usd_value, {from:operator_1});
+      var user_1_cusd = await cusd.balanceOf.call(user_1);
+      assert.equal(user_1_cusd, usd_value, "equal")
+      var totalSupply = await cusd.totalSupply.call();
+      assert.equal(totalSupply, usd_value, "equal")
+  }); 
+
 
 });
