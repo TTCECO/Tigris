@@ -76,7 +76,7 @@ contract('CFIAT', function() {
       assert.equal(totalSupply, usd_value , "equal")
   }); 
 
-  it("create cusd for address by not operator",function(){
+  it("burn cusd for address by operator, when not enough value to burn",function(){
     return CUSD.deployed().then(function(cusd) {
         return cusd.burn(user_2, usd_value * 2, {from:operator_1});
      }).catch(function(error) {
@@ -87,11 +87,24 @@ contract('CFIAT', function() {
         assert.equal(user_2_cusd, usd_value, "equal")
         var totalSupply = await cusd.totalSupply.call();
         assert.equal(totalSupply, usd_value , "equal")
-        
+
       }
     });
-
   });
+
+  it("claimToken by admin", async () =>{
+      const cusd = await CUSD.deployed();
+      ownerBalance = await web3.eth.getBalance(owner);
+      await cusd.sendTransaction({from: owner, to: cusd.address, value:10000});
+      await cusd.transfer(cusd.address,usd_value,{from:user_2});
+      await cusd.claimToken(cusd.address , {from:owner});
+      
+      var owner_cusd = await cusd.balanceOf.call(owner);
+      assert.equal(owner_cusd, usd_value, "equal")
+      var totalSupply = await cusd.totalSupply.call();
+      assert.equal(totalSupply, usd_value , "equal")
+      
+  }); 
 
 
 });
