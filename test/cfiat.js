@@ -5,6 +5,7 @@ contract('CFIAT', function() {
   var owner = eth.accounts[0];
   var operator_1 = eth.accounts[1];
   var user_1 = eth.accounts[2];
+  var user_2 = eth.accounts[3];
   var usd_value = 99 * 10 **18;
 
 	it("check admin",async () =>  {
@@ -37,7 +38,7 @@ contract('CFIAT', function() {
   });
 
 
-  it("create cusd for address by operator", async () =>{
+  it("create cusd for user_1 by operator", async () =>{
       const cusd = await CUSD.deployed();
       await cusd.create(user_1, usd_value, {from:operator_1});
       var user_1_cusd = await cusd.balanceOf.call(user_1);
@@ -45,6 +46,52 @@ contract('CFIAT', function() {
       var totalSupply = await cusd.totalSupply.call();
       assert.equal(totalSupply, usd_value, "equal")
   }); 
+
+
+  it("create cusd for user_2 by operator", async () =>{
+      const cusd = await CUSD.deployed();
+      await cusd.create(user_2, usd_value * 2, {from:operator_1});
+      var user_2_cusd = await cusd.balanceOf.call(user_2);
+      assert.equal(user_2_cusd, usd_value * 2, "equal")
+      var totalSupply = await cusd.totalSupply.call();
+      assert.equal(totalSupply, usd_value * 3, "equal")
+  }); 
+
+
+  it("burn cusd for user_2 by operator", async () =>{
+      const cusd = await CUSD.deployed();
+      await cusd.burn(user_2, usd_value , {from:operator_1});
+      var user_2_cusd = await cusd.balanceOf.call(user_2);
+      assert.equal(user_2_cusd, usd_value, "equal")
+      var totalSupply = await cusd.totalSupply.call();
+      assert.equal(totalSupply, usd_value * 2, "equal")
+  }); 
+
+  it("burn cusd for user_1 by operator", async () =>{
+      const cusd = await CUSD.deployed();
+      await cusd.burn(user_1, usd_value , {from:operator_1});
+      var user_1_cusd = await cusd.balanceOf.call(user_1);
+      assert.equal(user_1_cusd, 0, "equal")
+      var totalSupply = await cusd.totalSupply.call();
+      assert.equal(totalSupply, usd_value , "equal")
+  }); 
+
+  it("create cusd for address by not operator",function(){
+    return CUSD.deployed().then(function(cusd) {
+        return cusd.burn(user_2, usd_value * 2, {from:operator_1});
+     }).catch(function(error) {
+        assert(error.toString().includes('Error: VM Exception while processing transaction: revert'), error.toString())
+      async () => {
+
+        var user_2_cusd = await cusd.balanceOf.call(user_2);
+        assert.equal(user_2_cusd, usd_value, "equal")
+        var totalSupply = await cusd.totalSupply.call();
+        assert.equal(totalSupply, usd_value , "equal")
+        
+      }
+    });
+
+  });
 
 
 });
