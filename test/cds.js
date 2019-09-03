@@ -10,10 +10,6 @@ contract('CDS', function() {
 	it("get admin ",async () =>  {
         const cds = await CDS.deployed();
         const cusd = await CUSD.deployed();
-        const ccny = await CCNY.deployed();
-        console.log(cusd.address);
-        console.log(ccny.address);
-
         admin = await cds.admin.call()
         assert.equal(admin, owner, "equal")
   });
