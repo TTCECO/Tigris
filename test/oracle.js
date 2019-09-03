@@ -3,15 +3,13 @@ var USDTTC = artifacts.require("./ORACLE.sol");
 contract('ORACLE', function() {
 	var eth = web3.eth;
   var owner = eth.accounts[0];
-  var operator = eth.accounts[1];
+  var operator_1 = eth.accounts[1];
+  var operator_2 = eth.accounts[2];
+  var operator_3 = eth.accounts[3];
 
-  var CLAYReserveAddress = "0x018043e33dab6434d22c998c43f1dff47fbbccbf";
-  // pk = 52b9b455143c8fbb1a8e9ef3e2452a24bb196c86efc8a44f69fc7ad9ccced823
- 	var user = '0x48449ccfb77fc86707c9757009ca7be343902e3f';
- 	//pk = a9e9cb65e35cf7a52a13b285b3eb54cda5a5a04c6cf47dd18e38637533d10f28
 
   var initalCUSD = 0 * 10 **18;
-  var validBlockLen = 21; // about one minutes
+  var validLen = 4; // about one minutes
   var contractName = "USDTTC";
 
 	it("get admin",async () =>  {
@@ -22,9 +20,13 @@ contract('ORACLE', function() {
 
   it("admin set operator",async () =>  {
         const ut = await USDTTC.deployed();
-        await ut.addOperator(operator, {from:owner});
+        await ut.addOperator(operator_1, {from:owner});
+        await ut.addOperator(operator_2, {from:owner});
+        await ut.addOperator(operator_3, {from:owner});
         operators = await ut.getOperators.call();
-        assert.equal(operators[0], operator, "equal");
+        assert.equal(operators[0], operator_1, "equal");
+        assert.equal(operators[1], operator_2, "equal");
+        assert.equal(operators[2], operator_3, "equal");
   });
 
   it("admin set name",async () =>  {
@@ -34,11 +36,21 @@ contract('ORACLE', function() {
         assert.equal(contractName, name, "equal");
   });
 
-
   it("admin set valid length",async () =>  {
         const ut = await USDTTC.deployed();
-        await ut.setValidBlockLength(validBlockLen, {from:operator});
-        validLen = await ut.validBlockLength.call();
-        assert.equal(validBlockLen, validLen, "equal");
+        await ut.setValidDistance(validLen, {from:operator_1});
+        validLen = await ut.validDistance.call();
+        assert.equal(validLen, validLen, "equal");
+  });
+
+  it("admin set value",async () =>  {
+        const ut = await USDTTC.deployed();
+        blockNumber = await web3.eth.blockNumber + 5; // next 3 txs 
+        ut.setValue(145, {from:operator_1});
+        ut.setValue(146, {from:operator_2});
+        ut.setValue(153, {from:operator_3});
+
+        res = await ut.getValue.call(blockNumber);
+        assert.equal((145+146+153)/3, res, "equal");
   });
 });

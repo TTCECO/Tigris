@@ -6,7 +6,7 @@ import "./SafeMath.sol";
 contract ORACLE is PermissionGroups{
     string public name = "ORACLE";
     using SafeMath for uint;
-    uint public validBlockLength = 0;
+    uint public validDistance = 0;
     mapping (uint => mapping (address => uint)) valueRecord;
     uint[] public blockList;
 
@@ -14,32 +14,34 @@ contract ORACLE is PermissionGroups{
     	name = _name;
     }
 
-    function setValidBlockLength(uint _validBlockLength) onlyOperator public {
-    	validBlockLength = _validBlockLength;
+    function setValidDistance(uint _validDistance) onlyOperator public {
+    	validDistance = _validDistance;
     }
 
     function setValue(uint _value) onlyOperator public {
-        valueRecord[block.number][msg.sender] = _value;
-        if (blockList[blockList.length-1] < block.number) {
-        	blockList.push(block.number);
-        }  
+        if (valueRecord[block.number][msg.sender] == 0 ){
+        	valueRecord[block.number][msg.sender] = _value;
+			if (blockList.length == 0 || blockList[blockList.length-1] < block.number ) {
+        		blockList.push(block.number);
+        	} 
+        }
+
     }
 
-    function getValue(uint _number) public view returns (uint){
-    	if (blockList[blockList.length-1] + validBlockLength > _number) {
-	        uint count = 0;
-	        uint valueSum = 0;
-	        for (uint i = 0; i < operatorsGroup.length; ++i) {
-	            if (valueRecord[block.number][operatorsGroup[i]] > 0 ) {
+    function getValue(uint _blockNumber) public view returns (uint){
+        uint count = 0;
+        uint valueSum = 0;
+    	for (uint num = _blockNumber.sub(validDistance); num <_blockNumber; num ++ ){
+    		for (uint i = 0; i < operatorsGroup.length; ++i) {
+	            if (valueRecord[num][operatorsGroup[i]] > 0 ) {
 	            	count++;
-	            	valueSum += valueRecord[block.number][operatorsGroup[i]];
+	            	valueSum += valueRecord[num][operatorsGroup[i]];
 	            }
 	        }
-	        if (count > 0) {
-	        	return valueSum.div(count);
-	        }
     	}
-
+        if (count > 0) {
+        	return valueSum.div(count);
+        }
     	return 0;
     }
 	
