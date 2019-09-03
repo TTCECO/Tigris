@@ -6,7 +6,7 @@ import "./SafeMath.sol";
 contract ORACLE is PermissionGroups{
     string public name = "ORACLE";
     using SafeMath for uint;
-    uint validBlockLength = 0;
+    uint public validBlockLength = 0;
     mapping (uint => mapping (address => uint)) valueRecord;
     uint[] public blockList;
 
@@ -14,7 +14,7 @@ contract ORACLE is PermissionGroups{
     	name = _name;
     }
 
-    function setName(uint _validBlockLength) onlyOperator public {
+    function setValidBlockLength(uint _validBlockLength) onlyOperator public {
     	validBlockLength = _validBlockLength;
     }
 
