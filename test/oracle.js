@@ -1,4 +1,4 @@
-var USDTTC = artifacts.require("./ORACLE.sol");
+var USDTTC = artifacts.require("./Oracle.sol");
 
 contract('ORACLE', function() {
 	var eth = web3.eth;

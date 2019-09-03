@@ -1,7 +1,7 @@
-var CLAYTTC = artifacts.require("./ORACLE.sol");
-var CNYTTC = artifacts.require("./ORACLE.sol");
-var KRWTTC = artifacts.require("./ORACLE.sol");
-var USDTTC = artifacts.require("./ORACLE.sol");
+var CLAYTTC = artifacts.require("./Oracle.sol");
+var CNYTTC = artifacts.require("./Oracle.sol");
+var KRWTTC = artifacts.require("./Oracle.sol");
+var USDTTC = artifacts.require("./Oracle.sol");
 
 module.exports = function(deployer) {
   deployer.deploy([CLAYTTC,CNYTTC,KRWTTC,USDTTC]);
