@@ -11,13 +11,13 @@ contract('ORACLE', function() {
 
   var initalCUSD = 0 * 10 **18;
 
-	it("get admin ",async () =>  {
+	it("get admin",async () =>  {
         const cusd = await USDTTC.deployed();
         admin = await cusd.admin.call()
         assert.equal(admin, owner, "equal")
   });
 
-  it("admin set operator  ",async () =>  {
+  it("admin set operator",async () =>  {
         const cusd = await USDTTC.deployed();
         await cusd.addOperator(owner, {from:owner});
         operator = await cusd.getOperators.call();
