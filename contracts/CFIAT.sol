@@ -19,7 +19,7 @@ contract TST20 {
 contract StandardToken is TST20, PermissionGroups {
 
     using SafeMath for uint;
-    mapping (address => mapping (address => uint)) allowed;
+    mapping(address => mapping (address => uint)) allowed;
     mapping(address => uint) balances;
     
     function transfer(address _to, uint _value) public{
