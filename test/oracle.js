@@ -36,14 +36,14 @@ contract('ORACLE', function() {
 
   it("admin set name",async () =>  {
         const ut = await USDTTC.deployed();
-        await ut.setName(contractName, {from:operator_1});
+        await ut.setName(contractName, {from:owner});
         name = await ut.name.call();
         assert.equal(contractName, name, "equal");
   });
 
   it("admin set valid distance",async () =>  {
         const ut = await USDTTC.deployed();
-        await ut.setValidDistance(validDistance, {from:operator_1});
+        await ut.setValidDistance(validDistance, {from:owner});
         res = await ut.validDistance.call();
         assert.equal(res, validDistance, "equal");
   });
@@ -51,7 +51,7 @@ contract('ORACLE', function() {
   it("admin set minRecordNum",async () =>  {
         const ut = await USDTTC.deployed();
 
-        await ut.setMinRecordNum(minRecordNum, {from:operator_1});
+        await ut.setMinRecordNum(minRecordNum, {from:owner});
         res = await ut.minRecordNum.call();
         assert.equal(res, minRecordNum, "equal");
 
@@ -61,14 +61,19 @@ contract('ORACLE', function() {
   it("operators set value , not remove min & max ",async () =>  {
         const ut = await USDTTC.deployed();
 
-        await ut.setMinSourceNum(2, {from:operator_1});
+        await ut.setMinSourceNum(2, {from:owner});
         res = await ut.minSourceNum.call();
         assert.equal(res, 2, "equal");
 
 
-        await ut.setIsRemoveMaxMin(false, {from:operator_1});
+        await ut.setIsRemoveMaxMin(false, {from:owner});
         res = await ut.isRemoveMaxMin.call();
         assert.equal(res, false, "equal");
+
+
+        await ut.setLastValue(145, {from:owner});
+        res = await ut.lastValue.call();
+        assert.equal(res, 145, "equal");
 
         await ut.setValue(145, {from:operator_1});
         await ut.setValue(146, {from:operator_2});
@@ -84,11 +89,11 @@ contract('ORACLE', function() {
   it("operators set value, remove min & max",async () =>  {
         const ut = await USDTTC.deployed();
  
-        await ut.setIsRemoveMaxMin(true, {from:operator_1});
+        await ut.setIsRemoveMaxMin(true, {from:owner});
         res = await ut.isRemoveMaxMin.call();
         assert.equal(res, true, "equal");
 
-        await ut.setMinSourceNum(3, {from:operator_1});
+        await ut.setMinSourceNum(3, {from:owner});
         res = await ut.minSourceNum.call();
         assert.equal(res, 3, "equal");
 
