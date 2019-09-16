@@ -25,10 +25,10 @@ contract ORACLE is PermissionGroups{
         		blockList.push(block.number);
         	} 
         }
-
     }
 
     function getValue(uint _blockNumber) public view returns (uint){
+       
         uint count = 0;
         uint valueSum = 0;
     	for (uint num = _blockNumber.sub(validDistance); num <_blockNumber; num ++ ){

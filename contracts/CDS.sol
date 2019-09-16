@@ -14,10 +14,15 @@ contract CDS is PermissionGroups{
     TST20 public CCNY;
     TST20 public CKRW;
     
-    ORC public USDTTC;
-    ORC public CNYTTC;
-    ORC public KRWTTC;
-    ORC public CLAYTTC;
+    ORC public USD_TTC;
+    ORC public CNY_TTC;
+    ORC public KRW_TTC;
+    ORC public CLAY_TTC;
+
+    ORC public VOTE_REWARD;
+
+    uint public denominator = 10000;
+
 
     struct DepositRecord {
         uint time;
@@ -30,6 +35,11 @@ contract CDS is PermissionGroups{
     mapping(address => DepositRecord) public collateralTTC;
     mapping(address => mapping(address => DepositRecord)) public collateralTokens;
  
+    function setVoteReward(address _tokenAddress) onlyAdmin public {
+        require(_tokenAddress != address(0));
+        VOTE_REWARD = ORC(_tokenAddress);
+    }
+
     function addAcceptCollateralToken(address _tokenAddress, string _name) onlyAdmin public {
         require(_tokenAddress != address(0));
         if (keccak256(acceptCollateralToken[_tokenAddress]) == keccak256("")) {
@@ -42,23 +52,27 @@ contract CDS is PermissionGroups{
         return acceptCollateralToken[_tokenAddress];
     }
 
+
+
     function() payable public{
         DepositRecord storage record = collateralTTC[msg.sender] ;
         uint newValue = recalculateDeposit(record);
+        //uint newValue = getTestValue();
         record.value = newValue.add(msg.value);
         record.time = block.timestamp;
 
     }
 
-    function recalculateDeposit(DepositRecord _record) internal pure returns (uint256) {
+    function recalculateDeposit(DepositRecord _record) internal view returns (uint) {
         // base on time and value
         // and get rate from oracle
-
-        return _record.value;
+        
+        uint value = VOTE_REWARD.getValue(block.number);
+        uint value2 = _record.value.mul(denominator+value);
+        uint value3 = value2.div(denominator);
+        return value3;
+        
     }
-
-
-
 
 
 }
