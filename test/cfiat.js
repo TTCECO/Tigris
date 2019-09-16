@@ -1,4 +1,8 @@
+//var CCNY = artifacts.require("./CFIAT.sol");
+//var CKRW = artifacts.require("./CFIAT.sol");
 var CUSD = artifacts.require("./CFIAT.sol");
+
+
 
 contract('CFIAT', function() {
 	var eth = web3.eth;
@@ -26,6 +30,19 @@ contract('CFIAT', function() {
   		var totalSupply = await cusd.totalSupply.call();
 		  assert.equal(totalSupply, 0, "equal")
   });	
+
+
+  it("set & check cfiat name", async () =>{
+      const cusd = await CUSD.deployed();
+      var name = await cusd.name.call();
+      assert.equal(name,"CFIAT","equal");
+      await cusd.setName("CUSD", {from:owner})
+      await cusd.setSymbol("CUSD", {from:owner})
+      name = await cusd.name.call();
+      assert.equal(name,"CUSD","equal");
+      symbol = await cusd.symbol.call();
+      assert.equal(name,"CUSD","equal");
+  }); 
 
 
   it("create cusd for address by not operator",function(){
