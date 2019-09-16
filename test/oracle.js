@@ -6,10 +6,11 @@ contract('ORACLE', function() {
   var operator_1 = eth.accounts[1];
   var operator_2 = eth.accounts[2];
   var operator_3 = eth.accounts[3];
+  var operator_4 = eth.accounts[4];
+  var operator_5 = eth.accounts[5];
 
   var validDistance = 25; // about one minutes
   var contractName = "USD_TTC";
-  var minSourceNum = 2;
   var minRecordNum = 5;
 
 
@@ -25,6 +26,8 @@ contract('ORACLE', function() {
         await ut.addOperator(operator_1, {from:owner});
         await ut.addOperator(operator_2, {from:owner});
         await ut.addOperator(operator_3, {from:owner});
+        await ut.addOperator(operator_4, {from:owner});
+        await ut.addOperator(operator_5, {from:owner});
         operators = await ut.getOperators.call();
         assert.equal(operators[0], operator_1, "equal");
         assert.equal(operators[1], operator_2, "equal");
@@ -45,32 +48,60 @@ contract('ORACLE', function() {
         assert.equal(res, validDistance, "equal");
   });
 
-  it("admin set min source number , isRemoveMaxMin and minRecordNum",async () =>  {
+  it("admin set minRecordNum",async () =>  {
         const ut = await USDTTC.deployed();
 
-        await ut.setMinSourceNum(minSourceNum, {from:operator_1});
+        await ut.setMinRecordNum(minRecordNum, {from:operator_1});
+        res = await ut.minRecordNum.call();
+        assert.equal(res, minRecordNum, "equal");
+
+  });
+
+
+  it("operators set value , not remove min & max ",async () =>  {
+        const ut = await USDTTC.deployed();
+
+        await ut.setMinSourceNum(2, {from:operator_1});
         res = await ut.minSourceNum.call();
-        assert.equal(res, minSourceNum, "equal");
+        assert.equal(res, 2, "equal");
+
 
         await ut.setIsRemoveMaxMin(false, {from:operator_1});
         res = await ut.isRemoveMaxMin.call();
         assert.equal(res, false, "equal");
 
-        await ut.setMinRecordNum(minRecordNum, {from:operator_1});
-        res = await ut.minRecordNum.call();
-        assert.equal(res, minRecordNum, "equal");
-  });
-
-
-  it("admin set value",async () =>  {
-        const ut = await USDTTC.deployed();
         await ut.setValue(145, {from:operator_1});
         await ut.setValue(146, {from:operator_2});
         await ut.setValue(153, {from:operator_3});
 
         res = await ut.getLatestValue.call();
-        console.log("res =>",res);
-        //assert.equal((145+146+153)/3, res, "equal");
-        
+        assert.equal(res >= 145, true, "equal");
+        assert.equal(res <= 153, true, "equal");
+
   });
+
+
+  it("operators set value, remove min & max",async () =>  {
+        const ut = await USDTTC.deployed();
+ 
+        await ut.setIsRemoveMaxMin(true, {from:operator_1});
+        res = await ut.isRemoveMaxMin.call();
+        assert.equal(res, true, "equal");
+
+        await ut.setMinSourceNum(3, {from:operator_1});
+        res = await ut.minSourceNum.call();
+        assert.equal(res, 3, "equal");
+
+        await ut.setValue(145, {from:operator_1});
+        await ut.setValue(146, {from:operator_2});
+        await ut.setValue(153, {from:operator_3});
+        await ut.setValue(156, {from:operator_4});
+        await ut.setValue(153, {from:operator_5});
+
+        res = await ut.getLatestValue.call();
+        assert.equal(res >= 146, true, "equal");
+        assert.equal(res <= 153, true, "equal");
+
+  });
+
 });
