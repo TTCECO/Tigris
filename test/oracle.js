@@ -7,10 +7,12 @@ contract('ORACLE', function() {
   var operator_2 = eth.accounts[2];
   var operator_3 = eth.accounts[3];
 
+  var validDistance = 25; // about one minutes
+  var contractName = "USD_TTC";
+  var minSourceNum = 2;
+  var minRecordNum = 5;
 
-  var initalCUSD = 0 * 10 **18;
-  var validLen = 4; // about one minutes
-  var contractName = "USDTTC";
+
 
 	it("get admin",async () =>  {
         const ut = await USDTTC.deployed();
@@ -31,26 +33,44 @@ contract('ORACLE', function() {
 
   it("admin set name",async () =>  {
         const ut = await USDTTC.deployed();
-        await ut.setName(contractName, {from:owner});
+        await ut.setName(contractName, {from:operator_1});
         name = await ut.name.call();
         assert.equal(contractName, name, "equal");
   });
 
-  it("admin set valid length",async () =>  {
+  it("admin set valid distance",async () =>  {
         const ut = await USDTTC.deployed();
-        await ut.setValidDistance(validLen, {from:operator_1});
-        validLen = await ut.validDistance.call();
-        assert.equal(validLen, validLen, "equal");
+        await ut.setValidDistance(validDistance, {from:operator_1});
+        res = await ut.validDistance.call();
+        assert.equal(res, validDistance, "equal");
   });
+
+  it("admin set min source number , isRemoveMaxMin and minRecordNum",async () =>  {
+        const ut = await USDTTC.deployed();
+
+        await ut.setMinSourceNum(minSourceNum, {from:operator_1});
+        res = await ut.minSourceNum.call();
+        assert.equal(res, minSourceNum, "equal");
+
+        await ut.setIsRemoveMaxMin(false, {from:operator_1});
+        res = await ut.isRemoveMaxMin.call();
+        assert.equal(res, false, "equal");
+
+        await ut.setMinRecordNum(minRecordNum, {from:operator_1});
+        res = await ut.minRecordNum.call();
+        assert.equal(res, minRecordNum, "equal");
+  });
+
 
   it("admin set value",async () =>  {
         const ut = await USDTTC.deployed();
-        blockNumber = await web3.eth.blockNumber + 5; // next 3 txs 
-        ut.setValue(145, {from:operator_1});
-        ut.setValue(146, {from:operator_2});
-        ut.setValue(153, {from:operator_3});
+        await ut.setValue(145, {from:operator_1});
+        await ut.setValue(146, {from:operator_2});
+        await ut.setValue(153, {from:operator_3});
 
-        res = await ut.getValue.call(blockNumber);
-        assert.equal((145+146+153)/3, res, "equal");
+        res = await ut.getLatestValue.call();
+        console.log("res =>",res);
+        //assert.equal((145+146+153)/3, res, "equal");
+        
   });
 });
