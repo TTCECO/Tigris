@@ -70,7 +70,7 @@ contract ORACLE is PermissionGroups{
                 }else if (_value > detailRecord[num][1]) {
                     detailRecord[num][1] = _value;
                 }
-                detailRecord[num][2] += _value;
+                detailRecord[num][2] = detailRecord[num][2].add(_value);
                 detailRecord[num][3] += 1;
             } 
 
