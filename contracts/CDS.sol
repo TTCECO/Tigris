@@ -67,7 +67,7 @@ contract CDS is PermissionGroups{
         // base on time and value
         // and get rate from oracle
         
-        uint value = VOTE_REWARD.getValue(block.number);
+        uint value = VOTE_REWARD.getLatestValue();
         uint value2 = _record.value.mul(denominator+value);
         uint value3 = value2.div(denominator);
         return value3;
