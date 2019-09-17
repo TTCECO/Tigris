@@ -30,6 +30,8 @@ contract('ORACLE', function() {
 
   it("admin set operator",async () =>  {
         const ut = await SourceOrc.deployed();
+        const dc = await DC.deployed();
+
         await ut.addOperator(operator_1, {from:owner});
         await ut.addOperator(operator_2, {from:owner});
         await ut.addOperator(operator_3, {from:owner});
@@ -41,15 +43,17 @@ contract('ORACLE', function() {
         assert.equal(operators[2], operator_3, "equal");
 
 
-        const dc = await DC.deployed();
         await dc.addOperator(operator_1, {from:owner});
         operators = await dc.getOperators.call();
         assert.equal(operators[0], operator_1, "equal");
 
+        await dc.setSourceOrcale(ut.address, {from:owner});
+
   });
 
-  it("admin settings ",async () =>  {
+  it("update & getValue ",async () =>  {
         const ut = await SourceOrc.deployed();
+        const dc = await DC.deployed();
         await ut.setName(contractName, {from:owner});
         name = await ut.name.call();
         assert.equal(contractName, name, "equal");
@@ -80,9 +84,14 @@ contract('ORACLE', function() {
         await ut.setValue(156, {from:operator_4});
         await ut.setValue(153, {from:operator_5});
 
-        res = await ut.getLatestValue.call();
-        assert.equal(res >= 146, true, "equal");
-        assert.equal(res <= 153, true, "equal");
+        res1 = await ut.getLatestValue.call();
+
+        await dc.updateRecord( {from:operator_1});
+
+        start = parseInt(new Date().getTime()/1000 - 100);
+        end = parseInt(new Date().getTime()/1000 + 100);
+        res2 = await dc.getValue(start, end);
+        assert.equal(parseInt(res1), parseInt(res2), "equal");
 
   });
 

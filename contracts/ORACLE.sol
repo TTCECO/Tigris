@@ -15,8 +15,8 @@ contract ORACLE is PermissionGroups{
     uint public changeRateInMillion = 50000; // change rate , default 50,000/1000,000
     uint public lastValue = 0;  // do not use this as value, because valid distance
 
-    mapping (uint => mapping (address => uint)) valueRecord;
-    mapping (uint => mapping (uint => uint)) detailRecord; // 0-min / 1-max / 2-sum / 3-cnt / 4-fixed
+    mapping (uint => mapping (address => uint)) public valueRecord;
+    mapping (uint => mapping (uint => uint)) public detailRecord; // 0-min / 1-max / 2-sum / 3-cnt / 4-fixed
     uint[] public blockList;
 
 
