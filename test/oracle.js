@@ -78,6 +78,7 @@ contract('ORACLE', function() {
         await ut.setValue(145, {from:operator_1});
         await ut.setValue(146, {from:operator_2});
         await ut.setValue(153, {from:operator_3});
+        await ut.setValue(147, {from:operator_4});
 
         res = await ut.getLatestValue.call();
         assert.equal(res >= 145, true, "equal");
