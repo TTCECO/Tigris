@@ -88,10 +88,14 @@ contract('ORACLE', function() {
 
         await dc.updateRecord( {from:operator_1});
 
-        start = parseInt(new Date().getTime()/1000 - 100);
-        end = parseInt(new Date().getTime()/1000 + 100);
+        start = parseInt(new Date().getTime()/1000);
+        end = parseInt(new Date().getTime()/1000);
         res2 = await dc.getValue(start, end);
         assert.equal(parseInt(res1), parseInt(res2), "equal");
+
+        await dc.replaceValue(end, 180, {from:operator_1});
+        res2 = await dc.getValue(start, end);
+        assert.equal(res2, 180, "equal");
 
   });
 
