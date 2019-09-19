@@ -280,7 +280,7 @@ contract CDSDatabase is PermissionGroups {
         return CLAYAmounts.mul(rateCLAY2TTC).div(BASE_PERCENT).add(TTCAmounts);
     }
 
-    /* get liquidationRate*/
+    /* get collateral rate by address*/
     function getCollateralRate(address _addr) public returns(uint,uint) {
         require(_addr != address(0));
         uint collateralValue = getCollateralByTTC(_addr);
@@ -291,11 +291,20 @@ contract CDSDatabase is PermissionGroups {
         return (collateralRate,serviceFee);
     }
     
-    /*liquidation Acoount */
+    /*delete acoount */
     function deleteAccount(address _addr) public onlyOperator {
         require(_addr != address(0));
         uint generateDValue = getCFIATByTTC(generate[_addr].CUSDAmounts,generate[_addr].CCNYAmounts,generate[_addr].CKRWAmounts);
         debtTotal = debtTotal.sub(generateDValue);
+        if (generate[_addr].CUSDAmounts > 0) {
+            debtCUSD = debtCUSD.sub(generate[_addr].CUSDAmounts);
+        }
+        if (generate[_addr].CCNYAmounts > 0) {
+            debtCCNY = debtCCNY.sub(generate[_addr].CCNYAmounts);
+        }
+        if (generate[_addr].CKRWAmounts > 0) {
+            debtCKRW = debtCKRW.sub(generate[_addr].CKRWAmounts);
+        }
         delete collateral[_addr];
         delete generate[_addr];
     }
