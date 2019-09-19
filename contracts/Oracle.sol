@@ -3,7 +3,7 @@ pragma solidity ^0.4.19;
 import "./PermissionGroups.sol";
 import "./SafeMath.sol";
 
-contract ORACLE is PermissionGroups{
+contract Oracle is PermissionGroups{
 
     using SafeMath for uint;
 
