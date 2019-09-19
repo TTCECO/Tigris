@@ -47,8 +47,12 @@ contract CDS is PermissionGroups {
             CCNY = CFIAT(_addr);     
         }else if (_type == 4) {
             CKRW = CFIAT(_addr);  
-        }else if (_type == 5){
+        }else if (_type == 5) {
             DB = CDSDB(_addr);
+        }else if (_type == 6) {
+            TTCDrawAddress = _addr;
+        }else if (_type == 7) {
+            CLAYDrawAddress = _addr;
         }
     }    
 
@@ -60,7 +64,7 @@ contract CDS is PermissionGroups {
         uint TTCCollateralTime;
         (TTCCollateralAmounts,TTCCollateralTime) = DB.getTTCCollateralInfo(msg.sender);
         if (TTCCollateralTime == 0) {
-            TTCCollateralAmounts = TTCCollateralAmounts.add(msg.value);
+            TTCCollateralAmounts = msg.value;
             DB.setTTCCollateralInfo(msg.sender,TTCCollateralAmounts);
         }else {
             uint TTCGain = DB.getTTCGain(msg.sender);
@@ -77,7 +81,7 @@ contract CDS is PermissionGroups {
         uint CLAYCollateralTime;
         (CLAYCollateralAmounts,CLAYCollateralTime) = DB.getCLAYCollateralInfo(msg.sender);
         if (CLAYCollateralTime == 0) {
-            CLAYCollateralAmounts = CLAYCollateralAmounts.add(_collateralCLAYAmount);
+            CLAYCollateralAmounts = _collateralCLAYAmount;
             DB.setCLAYCollateralInfo(msg.sender,CLAYCollateralAmounts);
         }else {
             uint TTCCollateralAmounts;
@@ -204,9 +208,12 @@ contract CDS is PermissionGroups {
         (TTCCollateralAmounts,CLAYCollateralAmounts) = DB.getAddrTotalCollateral(_addr);
         // return service Fee
         CLAY.transferFrom(msg.sender,address(this),serviceFee);
-        //get CLAY & TTC
-        CLAY.transfer(msg.sender,CLAYCollateralAmounts);
-        msg.sender.transfer(TTCCollateralAmounts);
+        if (CLAYCollateralAmounts > 0) {
+            CLAY.transfer(msg.sender,CLAYCollateralAmounts);
+        }
+        if (TTCCollateralAmounts > 0) {
+            msg.sender.transfer(TTCCollateralAmounts);
+        }
         //burn stableCoin
         uint CUSDAmounts;
         uint CCNYAmounts;
@@ -251,14 +258,18 @@ contract CDS is PermissionGroups {
             }
         }
     }
-    
-    /*withdraw TTC for Vote */
-    function drawTTC()  onlyOperator public {
+
+    /* charge ttc into contract */
+    function chargeTTC() payable public  {
+    }
+
+    /*withdraw TTC by operator */
+    function withdrawTTC() onlyOperator public {
         require(TTCDrawAddress.send(this.balance));
     }
     
-    /*withdraw CLAY */
-    function drawCLAY()  onlyOperator public {
+    /*withdraw CLAY by operator */
+    function withdrawCLAY() onlyOperator public {
         CLAY.transfer(CLAYDrawAddress,CLAY.balanceOf(this));
     }
 }
