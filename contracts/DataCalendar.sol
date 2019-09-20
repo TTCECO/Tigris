@@ -24,7 +24,7 @@ contract DataCalendar is PermissionGroups{
     /* set sourceOrcale */
     function setSourceOrcale(address _addr) onlyAdmin public {
     	require(_addr != address(0));
-    	sourceOrcale = ORC(_addr);
+    	sourceOrcale = Oracle(_addr);
     }
 
     function updateRecord() onlyOperator public {
