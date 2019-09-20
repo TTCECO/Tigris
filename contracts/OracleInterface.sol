@@ -1,5 +1,6 @@
 pragma solidity ^0.4.19;
 
-interface ORC {
-	function getLatestValue() public view returns (uint);
+interface Oracle {
+    function getLatestValue() public view returns(uint);
+
 }
