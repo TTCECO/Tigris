@@ -69,7 +69,7 @@ contract CDSDatabase is PermissionGroups {
     }
 
     /*get gain value by TTC for TTC collateral by address */
-    function getTTCGain(address _addr) public returns (uint){
+    function getTTCGain(address _addr) public view returns (uint){
         require(_addr != address(0));
         if(collateral[_addr].TTCTime > 0 && collateral[_addr].TTCAmounts > 0 && _addr != address(0)){
             uint startTime = collateral[_addr].TTCTime.add(SECONDS_PER_DAY.mul(2));
@@ -84,7 +84,7 @@ contract CDSDatabase is PermissionGroups {
     }
     
     /*get gain value for CLAY collateral by address, the gain contain CLAY from service feed & TTC from reserve vote reward */
-    function getCLAYGain(address _addr) public returns (uint,uint){
+    function getCLAYGain(address _addr) public view returns (uint,uint){
         require(_addr != address(0));
         if(collateral[_addr].CLAYTime > 0 && collateral[_addr].CLAYAmounts > 0 && collateral[_addr].TTCTime > 0 && collateral[_addr].TTCAmounts > 0 && _addr != address(0)){
             uint startTime = collateral[_addr].CLAYTime.add(SECONDS_PER_DAY.mul(2));
@@ -103,7 +103,7 @@ contract CDSDatabase is PermissionGroups {
     }
     
     /*get total service fee by CLAY by address */
-    function getServiceFee(address _addr) public returns (uint){
+    function getServiceFee(address _addr) public view returns (uint){
         require(_addr != address(0));
         uint startTime = generate[_addr].generateTime.add(SECONDS_PER_DAY);
         uint currentserviceFeeRate =0 ;
@@ -129,7 +129,7 @@ contract CDSDatabase is PermissionGroups {
     }
 
     /*get withdrawable value ,By TTC,or By CLAY,and serviceFee */
-    function getWithdrawable(address _addr) public returns(uint,uint,uint) {
+    function getWithdrawable(address _addr) public view returns(uint,uint,uint) {
         require(_addr != address(0));
         uint RateCLAY2TTC = CLAY2TTC.getLatestValue();
         uint serviceFee = getServiceFee(_addr);
@@ -218,7 +218,7 @@ contract CDSDatabase is PermissionGroups {
     }
     
      /*get generate limit */
-    function getGenerateLimit(uint _type, address _addr) public returns(uint,uint) {
+    function getGenerateLimit(uint _type, address _addr) public view returns(uint,uint) {
         require(_addr != address(0));
         require(_type == 1 || _type == 2 || _type == 3);
         uint remainValueTTC;
@@ -237,7 +237,7 @@ contract CDSDatabase is PermissionGroups {
     }
     
     /* cal return serviceFee*/
-    function getReturnServiceFee(address _addr,uint _amounts,uint _type) public returns(uint,uint) {
+    function getReturnServiceFee(address _addr,uint _amounts,uint _type) public view returns(uint,uint) {
         require(_addr != address(0));
         require(_amounts > 0 && (_type == 1 || _type == 2 || _type == 3));
         uint generatedValue = getCFIATByTTC(generate[_addr].CUSDAmounts,generate[_addr].CCNYAmounts,generate[_addr].CKRWAmounts);
@@ -281,7 +281,7 @@ contract CDSDatabase is PermissionGroups {
     }
 
     /* get collateral rate by address*/
-    function getCollateralRate(address _addr) public returns(uint,uint) {
+    function getCollateralRate(address _addr) public view returns(uint,uint) {
         require(_addr != address(0));
         uint collateralValue = getCollateralByTTC(_addr);
         uint serviceFee = getServiceFee(_addr);
