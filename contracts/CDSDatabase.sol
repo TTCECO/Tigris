@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 import "./PermissionGroups.sol";
 import "./OracleInterface.sol";
-import "./RateInterface.sol";
+import "./DataCalendarInterface.sol";
 import "./TST20Interface.sol";
 import "./SafeMath.sol";
 
