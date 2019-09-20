@@ -11,7 +11,7 @@ contract DataCalendar is PermissionGroups{
     uint public constant SECONDS_PER_DAY = 86400;
 
     string public name = "DataCalendar";
-    ORC public sourceOrcale;
+    Oracle public sourceOrcale;
     mapping(uint => uint) public dailyData; 	// timestamp/86400 => value
     uint public minDate;
     uint public maxDate;
