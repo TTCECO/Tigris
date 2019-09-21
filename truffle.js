@@ -17,14 +17,11 @@ module.exports = {
   // to customize your Truffle configuration!
   networks: {
       development: {
-          host: "localhost",
-          port: 8545,
-          network_id: "*" // Match any network id
-      },
-      privatenetwork:  {
-          host: "localhost",
-          port: 8503,
-          network_id: "*" 
+          host: "127.0.0.1", //"47.111.177.215",
+          port: 8545,        //8513,
+          //gas: 10000000,
+          network_id: "*",   // Match any network id
+          //from:"0x923a90a6a30968e1dfc3b363ba621f453edb1d60" // testnet account
       }
-   }   
+   }
 }
