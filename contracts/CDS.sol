@@ -36,6 +36,15 @@ contract CDS is PermissionGroups {
 
     address public TTCDrawAddress;
     address public CLAYDrawAddress;
+
+    event UO(uint type, address addr, uint value); 
+    // user operation 
+    // 1 - collateralTTC
+    // 2 - collateralCLAY
+    // 3 - 5 generateCFIAT CUSD,CCNY,CKRW
+    // 6 - 8 returnCFIAT   CUSD,CCNY,CKRW
+    // 9 - retrieveTTC
+    // 10 - retrieveCLAY
     
     function initAddressSettings(uint _type,address _addr) onlyOperator public {
         require(_addr != address(0));
@@ -71,6 +80,7 @@ contract CDS is PermissionGroups {
             TTCCollateralAmounts = TTCCollateralAmounts.add(msg.value).add(TTCGain);
             DB.setTTCCollateralInfo(msg.sender,TTCCollateralAmounts);
         }
+        UO(1,msg.sender,msg.value);
     }
     
     /*collateral CLAY */
@@ -90,7 +100,7 @@ contract CDS is PermissionGroups {
             CLAYCollateralAmounts = CLAYCollateralAmounts.add(_collateralCLAYAmount);
             DB.setCLAYCollateralInfo(msg.sender,CLAYCollateralAmounts);
         }
-        
+        UO(2,msg.sender,_collateralCLAYAmount);
     }
     
     /* generate CFIAT */
@@ -122,6 +132,7 @@ contract CDS is PermissionGroups {
             DB.setGenerateInfo(3,msg.sender,CKRWAmounts,serviceFee);
             CKRW.create(msg.sender,_generateAmounts);
         }
+        UO(_type.add(2),msg.sender,_generateAmounts);
     } 
     
     /* return stable coin */
@@ -155,7 +166,7 @@ contract CDS is PermissionGroups {
             CLAY.transferFrom(msg.sender,address(this),needToReturnServiceFee);
             CKRW.burn(msg.sender,_returnAmounts);
         }
-        
+        UO(_type.add(5),msg.sender,_returnAmounts);
     }
     /* retrieve TTC*/ 
     function retrieveTTC(uint _retrieveAmounts) public {
@@ -175,6 +186,7 @@ contract CDS is PermissionGroups {
         }
         retrieve.TTCAmounts[msg.sender] = retrieve.TTCAmounts[msg.sender].add(_retrieveAmounts);
         retrieve.totalRetrieveTTC = retrieve.totalRetrieveTTC.add(_retrieveAmounts);
+        UO(9,msg.sender,_retrieveAmounts);
     }
     
     /* retrieve CLAY*/ 
@@ -195,6 +207,7 @@ contract CDS is PermissionGroups {
         }
         retrieve.CLAYAmounts[msg.sender] = retrieve.CLAYAmounts[msg.sender].add(_retrieveAmounts);
         retrieve.totalRetrieveCLAY = retrieve.totalRetrieveCLAY.add(_retrieveAmounts);
+        UO(10,msg.sender,_retrieveAmounts);
     }
     
     /* liquidation */
@@ -227,6 +240,7 @@ contract CDS is PermissionGroups {
             CKRW.burn(msg.sender,CKRWAmounts);
         }
         DB.deleteAccount(_addr);
+        
     }
     
     /*send collateral TTC to accounts */
