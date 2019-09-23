@@ -16,9 +16,17 @@ contract DataCalendar is PermissionGroups{
     uint public minDate;
     uint public maxDate;
 
+
+    uint public constant OFFSET_ZERO = 3;
+    uint public offset = 4; // if 4, the current data will be saved to yesterday record.
+
     /* set name of oracle */
     function setName(string _name) onlyAdmin public {
         name = _name;
+    }
+
+    function setOffset(uint _offset) onlyAdmin public {
+        offset = _offset;
     }
 
     /* set sourceOrcale */
@@ -28,8 +36,8 @@ contract DataCalendar is PermissionGroups{
     }
 
     function updateRecord() onlyOperator public {
-    	uint date = now.div(SECONDS_PER_DAY);
-    	if (dailyData[date] != 0){
+    	uint date = now.div(SECONDS_PER_DAY).add(OFFSET_ZERO).sub(offset);    
+	if (dailyData[date] != 0){
     		return;
     	}
     	dailyData[date] = sourceOrcale.getLatestValue();
