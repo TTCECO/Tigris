@@ -37,7 +37,7 @@ contract CDS is PermissionGroups {
     address public TTCDrawAddress;
     address public CLAYDrawAddress;
 
-    event UO(uint type, address addr, uint value); 
+    event UO(uint t, address addr, uint value); 
     // user operation 
     // 1 - collateralTTC
     // 2 - collateralCLAY
@@ -240,7 +240,7 @@ contract CDS is PermissionGroups {
             CKRW.burn(msg.sender,CKRWAmounts);
         }
         DB.deleteAccount(_addr);
-        
+
     }
     
     /*send collateral TTC to accounts */
