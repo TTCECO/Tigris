@@ -19,7 +19,6 @@ contract CDSDatabase is PermissionGroups {
     DC public reserveGainRate;      // n TTC / 1CLAY, for CLAY collateral by user
     DC public serviceFeeRate;       // n TTC / 1TTC 
     
-    uint public debtTotal;          // BY TTC
     uint public debtCUSD;           // By CUSD
     uint public debtCCNY;           // BY CCNY
     uint public debtCKRW;           // BY CKRW
@@ -220,7 +219,7 @@ contract CDSDatabase is PermissionGroups {
             }
             generateInfo.CKRWAmounts = _amounts;
         }
-        debtTotal = getCFIATByTTC(debtCUSD,debtCCNY,debtCKRW);
+
         generateInfo.preServiceFee = _serviceFee;
         generateInfo.generateTime = now;
     }
@@ -302,8 +301,7 @@ contract CDSDatabase is PermissionGroups {
     /*delete acoount */
     function deleteAccount(address _addr) public onlyOperator {
         require(_addr != address(0));
-        uint generateDValue = getCFIATByTTC(generate[_addr].CUSDAmounts,generate[_addr].CCNYAmounts,generate[_addr].CKRWAmounts);
-        debtTotal = debtTotal.sub(generateDValue);
+
         if (generate[_addr].CUSDAmounts > 0) {
             debtCUSD = debtCUSD.sub(generate[_addr].CUSDAmounts);
         }
