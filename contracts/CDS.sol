@@ -31,8 +31,8 @@ contract CDS is PermissionGroups {
     uint public constant BASE_DECIMAL = 6;
     uint public constant BASE_PERCENT = 10**BASE_DECIMAL; // 1000,000
     uint public constant liquidationRate = 9*10**(BASE_DECIMAL - 1);
-    uint public constant MIN_COLLATERAL_TTC = 1*10**18; 
-    uint public constant MIN_COLLATERAL_CLAY = 10*10**18; 
+    uint public constant MIN_COLLATERAL_TTC = 100*10**18; 
+    uint public constant MIN_COLLATERAL_CLAY = MIN_COLLATERAL_TTC * 10; 
 
     address public TTCDrawAddress;
     address public CLAYDrawAddress;
