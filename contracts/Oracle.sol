@@ -101,7 +101,7 @@ contract Oracle is PermissionGroups{
             if (num < block.number - validDistance) {
                 break;
             }
-            if (detailRecord[num][4] != 0) {
+            if (detailRecord[num][4] != 0 || detailRecord[num][3] >= minSourceNum) {
                 return detailRecord[num][4];
             }
         }
