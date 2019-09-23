@@ -45,6 +45,8 @@ contract CDS is PermissionGroups {
     // 6 - 8 returnCFIAT   CUSD,CCNY,CKRW
     // 9 - retrieveTTC
     // 10 - retrieveCLAY
+    // 11 - sendTTCToAccount
+    // 12 - sendCLAYToAccount
     
     function initAddressSettings(uint _type,address _addr) onlyOperator public {
         require(_addr != address(0));
@@ -253,6 +255,7 @@ contract CDS is PermissionGroups {
             address sendAddr = retrieve.TTCApplicants[i];
             if (retrieve.TTCAmounts[sendAddr] > 0) {
                 require(sendAddr.send(retrieve.TTCAmounts[sendAddr]));
+                UO(11,sendAddr,retrieve.TTCAmounts[sendAddr]);
                 retrieve.TTCAmounts[sendAddr] = 0;
             }
         }
@@ -268,6 +271,7 @@ contract CDS is PermissionGroups {
             address sendAddr = retrieve.CLAYApplicants[i];
             if (retrieve.CLAYAmounts[sendAddr] > 0) {
                 CLAY.transfer(sendAddr,retrieve.CLAYAmounts[sendAddr]);
+                UO(12,sendAddr,retrieve.CLAYAmounts[sendAddr]);
                 retrieve.CLAYAmounts[sendAddr] = 0;
             }
         }
