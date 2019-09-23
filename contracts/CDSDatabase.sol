@@ -23,6 +23,9 @@ contract CDSDatabase is PermissionGroups {
     uint public debtCUSD;           // By CUSD
     uint public debtCCNY;           // BY CCNY
     uint public debtCKRW;           // BY CKRW
+
+    uint public ctTTC;              // total collateral TTC 
+    uint public ctCLAY;             // total collateral CLAY
     
     struct GenerateInfo {
         uint CUSDAmounts;
@@ -160,18 +163,23 @@ contract CDSDatabase is PermissionGroups {
     function setTTCCollateralInfo (address _addr, uint _TTCAmounts) public onlyOperator {
         require(_addr != address(0));
         CollateralInfo storage collateralInfo = collateral[_addr];
+        ctTTC = ctTTC.add(_TTCAmounts).sub(collateralInfo.TTCAmounts);
         collateralInfo.TTCAmounts = _TTCAmounts;
         if (_TTCAmounts == 0){
             collateralInfo.TTCTime = 0;
         }else{
             collateralInfo.TTCTime = now;
         } 
+
+
+        
     }
     
     /* set collateralInfo For CLAY */
     function setCLAYCollateralInfo (address _addr, uint _CLAYAmounts) public onlyOperator {
         require(_addr != address(0));
         CollateralInfo storage collateralInfo = collateral[_addr];
+        ctCLAY = ctCLAY.add(_CLAYAmounts).sub(collateralInfo.CLAYAmounts);
         collateralInfo.CLAYAmounts = _CLAYAmounts;
         if (_CLAYAmounts == 0){
             collateralInfo.CLAYTime = 0;
@@ -305,6 +313,10 @@ contract CDSDatabase is PermissionGroups {
         if (generate[_addr].CKRWAmounts > 0) {
             debtCKRW = debtCKRW.sub(generate[_addr].CKRWAmounts);
         }
+
+        ctTTC = ctTTC.sub(collateral[_addr].TTCAmounts);
+        ctCLAY = ctCLAY.sub(collateral[_addr].CLAYAmounts);
+
         delete collateral[_addr];
         delete generate[_addr];
     }
