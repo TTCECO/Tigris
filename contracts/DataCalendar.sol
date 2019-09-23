@@ -11,7 +11,7 @@ contract DataCalendar is PermissionGroups{
     uint public constant SECONDS_PER_DAY = 86400;
 
     string public name = "DataCalendar";
-    Oracle public sourceOrcale;
+    Oracle public sourceOracle;
     mapping(uint => uint) public dailyData; 	// timestamp/86400 => value
     uint public minDate;
     uint public maxDate;
@@ -29,10 +29,10 @@ contract DataCalendar is PermissionGroups{
         offset = _offset;
     }
 
-    /* set sourceOrcale */
-    function setSourceOrcale(address _addr) onlyAdmin public {
+    /* set sourceOracle */
+    function setSourceOracle(address _addr) onlyAdmin public {
     	require(_addr != address(0));
-    	sourceOrcale = Oracle(_addr);
+    	sourceOracle = Oracle(_addr);
     }
 
     function updateRecord() onlyOperator public {
@@ -40,7 +40,7 @@ contract DataCalendar is PermissionGroups{
 	if (dailyData[date] != 0){
     		return;
     	}
-    	dailyData[date] = sourceOrcale.getLatestValue();
+    	dailyData[date] = sourceOracle.getLatestValue();
     	maxDate = date;
     	if (minDate == 0){
     		minDate = date;
