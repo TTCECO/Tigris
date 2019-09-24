@@ -49,7 +49,7 @@ contract CDSDatabase is PermissionGroups {
 
 
     /* initialize address settings*/
-    function initAddressSettings(uint _type,address _addr) onlyOperator public {
+    function initAddressSettings(uint _type,address _addr) onlyAdmin public {
         require(_addr != address(0));
         if (_type == 1) {
             CUSD2TTC = Oracle(_addr);       

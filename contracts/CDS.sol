@@ -48,7 +48,7 @@ contract CDS is PermissionGroups {
     // 11 - sendTTCToAccount
     // 12 - sendCLAYToAccount
     
-    function initAddressSettings(uint _type,address _addr) onlyOperator public {
+    function initAddressSettings(uint _type,address _addr) onlyAdmin public {
         require(_addr != address(0));
         if (_type == 1) {
             CLAY = TST20(_addr);       
