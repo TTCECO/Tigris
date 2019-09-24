@@ -228,7 +228,7 @@ contract CDS is PermissionGroups {
             CLAY.transfer(msg.sender,CLAYCollateralAmounts);
         }
         if (TTCCollateralAmounts > 0) {
-            msg.sender.transfer(TTCCollateralAmounts);
+            require(msg.sender.send(TTCCollateralAmounts));
         }
         //burn stableCoin
         uint CUSDAmounts;
