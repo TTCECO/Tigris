@@ -237,9 +237,11 @@ contract CDS is PermissionGroups {
         (CUSDAmounts,CCNYAmounts,CKRWAmounts,) = DB.getGenerateInfo(_addr);
         if (CUSDAmounts > 0) {
             CUSD.burn(msg.sender,CUSDAmounts);
-        }else if (CCNYAmounts > 0) {
+        } 
+        if (CCNYAmounts > 0) {
             CCNY.burn(msg.sender,CCNYAmounts);
-        }else if (CKRWAmounts > 0) {
+        } 
+        if (CKRWAmounts > 0) {
             CKRW.burn(msg.sender,CKRWAmounts);
         }
         DB.deleteAccount(_addr);
