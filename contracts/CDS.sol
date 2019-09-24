@@ -221,8 +221,9 @@ contract CDS is PermissionGroups {
         uint TTCCollateralAmounts;
         uint CLAYCollateralAmounts;
         (TTCCollateralAmounts,CLAYCollateralAmounts) = DB.getAddrTotalCollateral(_addr);
-        // return service Fee
-        CLAY.transferFrom(msg.sender,address(this),serviceFee);
+        if (serviceFee > 0){
+            CLAY.transferFrom(msg.sender,address(this),serviceFee);
+        }
         if (CLAYCollateralAmounts > 0) {
             CLAY.transfer(msg.sender,CLAYCollateralAmounts);
         }
@@ -233,7 +234,7 @@ contract CDS is PermissionGroups {
         uint CUSDAmounts;
         uint CCNYAmounts;
         uint CKRWAmounts;
-        (CUSDAmounts,CCNYAmounts,CKRWAmounts,) = DB.getGenerateInfo(msg.sender);
+        (CUSDAmounts,CCNYAmounts,CKRWAmounts,) = DB.getGenerateInfo(_addr);
         if (CUSDAmounts > 0) {
             CUSD.burn(msg.sender,CUSDAmounts);
         }else if (CCNYAmounts > 0) {
@@ -242,7 +243,6 @@ contract CDS is PermissionGroups {
             CKRW.burn(msg.sender,CKRWAmounts);
         }
         DB.deleteAccount(_addr);
-
     }
     
     /*send collateral TTC to accounts */
