@@ -25,6 +25,8 @@ contract CDSDatabase is PermissionGroups {
 
     uint public ctTTC;              // total collateral TTC 
     uint public ctCLAY;             // total collateral CLAY
+
+    uint public timeOffset = 1569398400; // 2019-9-25 16:00 UTC+8
     
     struct GenerateInfo {
         uint CUSDAmounts;
@@ -70,14 +72,21 @@ contract CDSDatabase is PermissionGroups {
         }
     }
 
+
+    function updateTimeOffset() onlyOperator public {
+        timeOffset = now.div(63).mul(63).sub(block.number.mul(3));
+    }
+    
+
     /*get gain value by TTC for TTC collateral by address */
     function getTTCGain(address _addr) public view returns (uint){
         require(_addr != address(0));
         if(collateral[_addr].TTCTime > 0 && collateral[_addr].TTCAmounts > 0 && _addr != address(0)){
             uint startTime = collateral[_addr].TTCTime.add(SECONDS_PER_DAY.mul(2));
             uint gainRate = 0;
-            if (now > startTime) {
-                gainRate = TTCGainRate.getValue(startTime,now);
+            uint cTime = timeOffset.add(block.number.mul(3));
+            if (cTime > startTime) {
+                gainRate = TTCGainRate.getValue(startTime,cTime);
             }
             return collateral[_addr].TTCAmounts.mul(gainRate).div(BASE_PERCENT);
         } else {
@@ -92,9 +101,10 @@ contract CDSDatabase is PermissionGroups {
             uint startTime = collateral[_addr].CLAYTime.add(SECONDS_PER_DAY.mul(2));
             uint gainRate = 0;
             uint reserveVoteGainRate = 0;
-            if(now > startTime) {
-                gainRate = CLAYGainRate.getValue(startTime,now);
-                reserveVoteGainRate = reserveGainRate.getValue(startTime,now);
+            uint cTime = timeOffset.add(block.number.mul(3));
+            if(cTime > startTime) {
+                gainRate = CLAYGainRate.getValue(startTime,cTime);
+                reserveVoteGainRate = reserveGainRate.getValue(startTime,cTime);
             }
             uint CLAYGain = collateral[_addr].CLAYAmounts.mul(gainRate).div(BASE_PERCENT);
             uint reserveVoteGain = collateral[_addr].CLAYAmounts.mul(reserveVoteGainRate).div(BASE_PERCENT);
@@ -109,10 +119,11 @@ contract CDSDatabase is PermissionGroups {
         require(_addr != address(0));
         uint startTime = generate[_addr].generateTime.add(SECONDS_PER_DAY);
         uint currentserviceFeeRate =0 ;
-        if (now < startTime) {
+        uint cTime = timeOffset.add(block.number.mul(3));
+        if (cTime < startTime) {
             return generate[_addr].preServiceFee;
         }
-        currentserviceFeeRate = serviceFeeRate.getValue(startTime,now);
+        currentserviceFeeRate = serviceFeeRate.getValue(startTime,cTime);
         // cal all stable token to TTC
         uint totalGenerateValue = getCFIATByTTC(generate[_addr].CUSDAmounts,generate[_addr].CCNYAmounts,generate[_addr].CKRWAmounts);
         // cal service Fee TTC => CLAY
@@ -167,11 +178,9 @@ contract CDSDatabase is PermissionGroups {
         if (_TTCAmounts == 0){
             collateralInfo.TTCTime = 0;
         }else{
-            collateralInfo.TTCTime = now;
+            uint cTime = timeOffset.add(block.number.mul(3));
+            collateralInfo.TTCTime = cTime;
         } 
-
-
-        
     }
     
     /* set collateralInfo For CLAY */
@@ -183,7 +192,8 @@ contract CDSDatabase is PermissionGroups {
         if (_CLAYAmounts == 0){
             collateralInfo.CLAYTime = 0;
         }else{
-            collateralInfo.CLAYTime = now;
+            uint cTime = timeOffset.add(block.number.mul(3));
+            collateralInfo.CLAYTime = cTime;
         }
     }
     
@@ -221,7 +231,8 @@ contract CDSDatabase is PermissionGroups {
         }
 
         generateInfo.preServiceFee = _serviceFee;
-        generateInfo.generateTime = now;
+        uint cTime = timeOffset.add(block.number.mul(3));
+        generateInfo.generateTime = cTime;
     }
     
      /*get generate limit */
