@@ -37,9 +37,11 @@ contract CDSDatabase is PermissionGroups {
     }
     struct CollateralInfo {
         uint TTCAmounts;
-        uint CLAYAmounts;
         uint TTCTime;
+        uint TTCHV;    
+        uint CLAYAmounts;
         uint CLAYTime;
+        uint CLAYHV;
     }
     mapping(address => CollateralInfo) public collateral;
     mapping(address => GenerateInfo) public generate;
@@ -81,14 +83,18 @@ contract CDSDatabase is PermissionGroups {
     /*get gain value by TTC for TTC collateral by address */
     function getTTCGain(address _addr) public view returns (uint){
         require(_addr != address(0));
-        if(collateral[_addr].TTCTime > 0 && collateral[_addr].TTCAmounts > 0 && _addr != address(0)){
+        if(collateral[_addr].TTCHV > 0 || collateral[_addr].TTCAmounts > 0){
             uint startTime = collateral[_addr].TTCTime.add(SECONDS_PER_DAY);
             uint gainRate = 0;
+            uint oneDayRate = 0;
             uint cTime = timeOffset.add(block.number.mul(3));
             if (cTime > startTime) {
-                gainRate = TTCGainRate.getValue(startTime,cTime);
+                gainRate = TTCGainRate.getValue(startTime, cTime);
             }
-            return collateral[_addr].TTCAmounts.mul(gainRate).div(BASE_PERCENT);
+            if (collateral[_addr].TTCHV > 0) {
+                oneDayRate = TTCGainRate.getValue(collateral[_addr].TTCTime, startTime);
+            }
+            return collateral[_addr].TTCAmounts.mul(gainRate).add(collateral[_addr].TTCHV.mul(oneDayRate)).div(BASE_PERCENT);
         } else {
             return 0;
         }
@@ -97,7 +103,7 @@ contract CDSDatabase is PermissionGroups {
     /*get gain value for CLAY collateral by address, the gain contain CLAY from service feed & TTC from reserve vote reward */
     function getCLAYGain(address _addr) public view returns (uint,uint){
         require(_addr != address(0));
-        if(collateral[_addr].CLAYTime > 0 && collateral[_addr].CLAYAmounts > 0 && collateral[_addr].TTCTime > 0 && collateral[_addr].TTCAmounts > 0 && _addr != address(0)){
+        if(collateral[_addr].CLAYHV > 0 || collateral[_addr].CLAYAmounts > 0){
             uint startTime = collateral[_addr].CLAYTime.add(SECONDS_PER_DAY);
             uint gainRate = 0;
             uint reserveVoteGainRate = 0;
@@ -106,9 +112,13 @@ contract CDSDatabase is PermissionGroups {
                 gainRate = CLAYGainRate.getValue(startTime,cTime);
                 reserveVoteGainRate = reserveGainRate.getValue(startTime,cTime);
             }
-            uint CLAYGain = collateral[_addr].CLAYAmounts.mul(gainRate).div(BASE_PERCENT);
-            uint reserveVoteGain = collateral[_addr].CLAYAmounts.mul(reserveVoteGainRate).div(BASE_PERCENT);
-            return (CLAYGain,reserveVoteGain);
+            uint CLAYGain = collateral[_addr].CLAYAmounts.mul(gainRate);
+            uint reserveVoteGain = collateral[_addr].CLAYAmounts.mul(reserveVoteGainRate);
+            if(collateral[_addr].CLAYHV > 0) {
+                CLAYGain = CLAYGain.add(collateral[_addr].CLAYHV.mul(CLAYGainRate.getValue(collateral[_addr].CLAYTime,startTime)));
+                reserveVoteGain = reserveVoteGain.add(collateral[_addr].CLAYHV.mul( reserveGainRate.getValue(collateral[_addr].CLAYTime,startTime)));
+            }
+            return (CLAYGain.div(BASE_PERCENT),reserveVoteGain.div(BASE_PERCENT));
         } else {
             return (0,0);
         }
@@ -173,28 +183,26 @@ contract CDSDatabase is PermissionGroups {
     function setTTCCollateralInfo (address _addr, uint _TTCAmounts) public onlyOperator {
         require(_addr != address(0));
         CollateralInfo storage collateralInfo = collateral[_addr];
+        uint cTime = timeOffset.add(block.number.mul(3));
+        if (cTime.div(SECONDS_PER_DAY) > collateralInfo.TTCTime.div(SECONDS_PER_DAY)) {
+            collateralInfo.TTCHV = collateralInfo.TTCAmounts;
+        }
         ctTTC = ctTTC.add(_TTCAmounts).sub(collateralInfo.TTCAmounts);
         collateralInfo.TTCAmounts = _TTCAmounts;
-        if (_TTCAmounts == 0){
-            collateralInfo.TTCTime = 0;
-        }else{
-            uint cTime = timeOffset.add(block.number.mul(3));
-            collateralInfo.TTCTime = cTime;
-        } 
+        collateralInfo.TTCTime = cTime;
     }
     
     /* set collateralInfo For CLAY */
     function setCLAYCollateralInfo (address _addr, uint _CLAYAmounts) public onlyOperator {
         require(_addr != address(0));
         CollateralInfo storage collateralInfo = collateral[_addr];
+        uint cTime = timeOffset.add(block.number.mul(3));
+        if (cTime.div(SECONDS_PER_DAY) > collateralInfo.CLAYTime.div(SECONDS_PER_DAY)) {
+            collateralInfo.CLAYHV = collateralInfo.CLAYAmounts;
+        }       
         ctCLAY = ctCLAY.add(_CLAYAmounts).sub(collateralInfo.CLAYAmounts);
         collateralInfo.CLAYAmounts = _CLAYAmounts;
-        if (_CLAYAmounts == 0){
-            collateralInfo.CLAYTime = 0;
-        }else{
-            uint cTime = timeOffset.add(block.number.mul(3));
-            collateralInfo.CLAYTime = cTime;
-        }
+        collateralInfo.CLAYTime = cTime;
     }
     
     function getGenerateInfo(address _addr) public view returns (uint,uint,uint,uint) {
