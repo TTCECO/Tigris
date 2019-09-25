@@ -82,7 +82,7 @@ contract CDSDatabase is PermissionGroups {
     function getTTCGain(address _addr) public view returns (uint){
         require(_addr != address(0));
         if(collateral[_addr].TTCTime > 0 && collateral[_addr].TTCAmounts > 0 && _addr != address(0)){
-            uint startTime = collateral[_addr].TTCTime.add(SECONDS_PER_DAY.mul(2));
+            uint startTime = collateral[_addr].TTCTime.add(SECONDS_PER_DAY);
             uint gainRate = 0;
             uint cTime = timeOffset.add(block.number.mul(3));
             if (cTime > startTime) {
@@ -98,7 +98,7 @@ contract CDSDatabase is PermissionGroups {
     function getCLAYGain(address _addr) public view returns (uint,uint){
         require(_addr != address(0));
         if(collateral[_addr].CLAYTime > 0 && collateral[_addr].CLAYAmounts > 0 && collateral[_addr].TTCTime > 0 && collateral[_addr].TTCAmounts > 0 && _addr != address(0)){
-            uint startTime = collateral[_addr].CLAYTime.add(SECONDS_PER_DAY.mul(2));
+            uint startTime = collateral[_addr].CLAYTime.add(SECONDS_PER_DAY);
             uint gainRate = 0;
             uint reserveVoteGainRate = 0;
             uint cTime = timeOffset.add(block.number.mul(3));
