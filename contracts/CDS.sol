@@ -87,7 +87,7 @@ contract CDS is PermissionGroups {
     
     /*collateral CLAY */
     function collateralCLAY(uint _collateralCLAYAmount) public {
-        require(_collateralCLAYAmount > MIN_COLLATERAL_CLAY);
+        require(_collateralCLAYAmount >= MIN_COLLATERAL_CLAY);
         CLAY.transferFrom(msg.sender,address(this),_collateralCLAYAmount);
         uint CLAYCollateralAmounts;
         uint CLAYCollateralTime;
