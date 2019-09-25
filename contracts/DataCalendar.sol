@@ -59,7 +59,7 @@ contract DataCalendar is PermissionGroups{
     	}
 
     	uint sum = 0;
-    	for (uint i = start; i <= end; i++){
+    	for (uint i = start+1; i <= end; i++){
     		sum = sum.add(dailyData[i]);
     	}
     	return sum;
