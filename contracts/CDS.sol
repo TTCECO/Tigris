@@ -47,6 +47,7 @@ contract CDS is PermissionGroups {
     // 10 - retrieveCLAY
     // 11 - sendTTCToAccount
     // 12 - sendCLAYToAccount
+    // 13 - reCalCollateral
     
     function initAddressSettings(uint _type,address _addr) onlyAdmin public {
         require(_addr != address(0));
@@ -104,7 +105,18 @@ contract CDS is PermissionGroups {
         }
         UO(2,msg.sender,_collateralCLAYAmount);
     }
-    
+
+    /*re calculate collateral asset */
+    function reCalCollateral() public {
+        uint TTCCollateralAmounts;
+        uint CLAYCollateralAmounts;
+        (TTCCollateralAmounts,CLAYCollateralAmounts) = DB.getAddrTotalCollateral(msg.sender);
+        DB.setTTCCollateralInfo(msg.sender,TTCCollateralAmounts);
+        DB.setCLAYCollateralInfo(msg.sender,CLAYCollateralAmounts);
+        UO(13,msg.sender,0);
+    }    
+
+
     /* generate CFIAT */
     function generateCFIAT (uint _type,uint _generateAmounts) public  {
         require (_generateAmounts > 0);
