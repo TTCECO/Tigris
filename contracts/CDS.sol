@@ -49,6 +49,11 @@ contract CDS is PermissionGroups {
     // 12 - sendCLAYToAccount
     // 13 - reCalCollateral
     
+    function getRetrieveDaily(uint _currentTime, address _addr) public view returns(uint,uint){
+        require(_addr != address(0));
+        return (retrieveInfo[_currentTime.div(SECONDS_PER_DAY)].TTCAmounts[_addr],retrieveInfo[_currentTime.div(SECONDS_PER_DAY)].CLAYAmounts[_addr]);
+    }
+
     function initAddressSettings(uint _type,address _addr) onlyAdmin public {
         require(_addr != address(0));
         if (_type == 1) {
