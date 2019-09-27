@@ -168,23 +168,25 @@ contract CDS is PermissionGroups {
             serviceFee = serviceFee.sub(needToReturnServiceFee);
             CUSDAmounts = CUSDAmounts.sub(_returnAmounts);
             DB.setGenerateInfo(1,msg.sender,CUSDAmounts,serviceFee);
-            CLAY.transferFrom(msg.sender,address(this),needToReturnServiceFee);
             CUSD.burn(msg.sender,_returnAmounts);
         } else if (_type == 2) {
             (serviceFee,needToReturnServiceFee) = DB.getReturnServiceFee(msg.sender,_returnAmounts,2);
             serviceFee = serviceFee.sub(needToReturnServiceFee);
             CCNYAmounts = CCNYAmounts.sub(_returnAmounts);                                                         
             DB.setGenerateInfo(2,msg.sender,CCNYAmounts,serviceFee);
-            CLAY.transferFrom(msg.sender,address(this),needToReturnServiceFee);
             CCNY.burn(msg.sender,_returnAmounts);
         }else if (_type == 3) {
             (serviceFee,needToReturnServiceFee) = DB.getReturnServiceFee(msg.sender,_returnAmounts,3);
             serviceFee = serviceFee.sub(needToReturnServiceFee);
             CKRWAmounts = CKRWAmounts.sub(_returnAmounts);      
             DB.setGenerateInfo(3,msg.sender,CKRWAmounts,serviceFee);
-            CLAY.transferFrom(msg.sender,address(this),needToReturnServiceFee);
             CKRW.burn(msg.sender,_returnAmounts);
         }
+
+        if (needToReturnServiceFee > 0) {
+            CLAY.transferFrom(msg.sender,address(this),needToReturnServiceFee);
+        }
+
         UO(_type.add(5),msg.sender,_returnAmounts);
     }
     /* retrieve TTC*/ 
