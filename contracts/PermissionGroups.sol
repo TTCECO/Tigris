@@ -31,7 +31,7 @@ contract PermissionGroups {
      * @param newAdmin The address to transfer ownership to.
      */
     function transferAdmin(address newAdmin) public onlyAdmin {
-        require(admin != address(0));
+        require(newAdmin != address(0));
         admin = newAdmin;
     }
 
