@@ -194,12 +194,14 @@ contract CDS is PermissionGroups {
         uint availableValueByTTC;
         (availableValueByTTC,,) = DB.getWithdrawable(msg.sender);
         uint TTCCollateralAmounts;
-        (TTCCollateralAmounts,) = DB.getAddrTotalCollateral(msg.sender);
+        uint CLAYCollateralAmounts;
+        (TTCCollateralAmounts,CLAYCollateralAmounts) = DB.getAddrTotalCollateral(msg.sender);
         require(_retrieveAmounts <= availableValueByTTC && _retrieveAmounts <= TTCCollateralAmounts);
 
         // update applicants collateral Info 
         TTCCollateralAmounts = TTCCollateralAmounts.sub(_retrieveAmounts);
         DB.setTTCCollateralInfo(msg.sender,TTCCollateralAmounts);
+        DB.setCLAYCollateralInfo(msg.sender,CLAYCollateralAmounts);
         // storage daily applicants Info 
         dailyRetrieve storage retrieve = retrieveInfo[now.div(SECONDS_PER_DAY)];
         if (retrieve.TTCAmounts[msg.sender] == 0) {
