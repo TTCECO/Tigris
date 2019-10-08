@@ -48,6 +48,8 @@ contract CDS is PermissionGroups {
     // 11 - sendTTCToAccount
     // 12 - sendCLAYToAccount
     // 13 - reCalCollateral
+    // 14 - retrieveTTCByAdmin
+    // 15 - retrieveCLAYByAdmin
     
     function getRetrieveDaily(uint _currentTime, address _addr) public view returns(uint,uint){
         require(_addr != address(0));
@@ -313,4 +315,29 @@ contract CDS is PermissionGroups {
     function withdrawCLAY() onlyOperator public {
         CLAY.transfer(CLAYDrawAddress,CLAY.balanceOf(this));
     }
+
+    /* retrieve TTC By Admin only used in upgrade */ 
+    function retrieveTTCByAdmin(uint _time, address _address, uint _retrieveAmounts) onlyAdmin public {
+        require(_address != address(0));
+        dailyRetrieve storage retrieve = retrieveInfo[_time.div(SECONDS_PER_DAY)];
+        if (retrieve.TTCAmounts[_address] == 0) {
+            retrieve.TTCApplicants.push(_address);
+        }
+        retrieve.TTCAmounts[_address] = retrieve.TTCAmounts[_address].add(_retrieveAmounts);
+        retrieve.totalRetrieveTTC = retrieve.totalRetrieveTTC.add(_retrieveAmounts);
+        UO(14,_address,_retrieveAmounts);
+    }
+    
+    /* retrieve CLAY By Admin only used in upgrade*/ 
+    function retrieveCLAYByAdmin(uint _time, address _address, uint _retrieveAmounts) onlyAdmin public {
+        require(_address != address(0));
+        dailyRetrieve storage retrieve = retrieveInfo[_time.div(SECONDS_PER_DAY)];
+        if (retrieve.CLAYAmounts[_address] == 0) {
+            retrieve.CLAYApplicants.push(_address);
+        }
+        retrieve.CLAYAmounts[_address] = retrieve.CLAYAmounts[_address].add(_retrieveAmounts);
+        retrieve.totalRetrieveCLAY = retrieve.totalRetrieveCLAY.add(_retrieveAmounts);
+        UO(15,_address,_retrieveAmounts);
+    }
+
 }
