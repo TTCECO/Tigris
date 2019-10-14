@@ -17,9 +17,9 @@ module.exports = {
   // to customize your Truffle configuration!
   networks: {
       development: {
-          host: "127.0.0.1", //"47.111.177.215",
-          port: 8545,        //8513,
-          //gas: 10000000,
+          host: "47.111.177.215",
+          port: 8513,
+          gas: 8000000,
           network_id: "*",   // Match any network id
           //from:"0x923a90a6a30968e1dfc3b363ba621f453edb1d60" // testnet account
       }
