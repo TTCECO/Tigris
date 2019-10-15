@@ -193,6 +193,7 @@ contract CDS is PermissionGroups {
     }
     /* retrieve TTC*/ 
     function retrieveTTC(uint _retrieveAmounts) public {
+        require(_retrieveAmounts > 0);
         uint availableValueByTTC;
         (availableValueByTTC,,) = DB.getWithdrawable(msg.sender);
         uint TTCCollateralAmounts;
@@ -216,6 +217,7 @@ contract CDS is PermissionGroups {
     
     /* retrieve CLAY*/ 
     function retrieveCLAY(uint _retrieveAmounts) public {
+        require(_retrieveAmounts > 0);
         uint availableValueByCLAY;
         (,availableValueByCLAY,) = DB.getWithdrawable(msg.sender);
         uint TTCCollateralAmounts;
