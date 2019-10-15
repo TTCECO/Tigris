@@ -281,9 +281,10 @@ contract CDS is PermissionGroups {
         for (uint i=_beginIndex; i < _endIndex ; i++) {
             address sendAddr = retrieve.TTCApplicants[i];
             if (retrieve.TTCAmounts[sendAddr] > 0) {
-                require(sendAddr.send(retrieve.TTCAmounts[sendAddr]));
-                UO(11,sendAddr,retrieve.TTCAmounts[sendAddr]);
+                uint amount = retrieve.TTCAmounts[sendAddr];
                 retrieve.TTCAmounts[sendAddr] = 0;
+                require(sendAddr.send(amount));
+                UO(11,sendAddr,amount);
             }
         }
     }
@@ -297,9 +298,10 @@ contract CDS is PermissionGroups {
         for (uint i=_beginIndex; i < _endIndex ; i++) {
             address sendAddr = retrieve.CLAYApplicants[i];
             if (retrieve.CLAYAmounts[sendAddr] > 0) {
-                CLAY.transfer(sendAddr,retrieve.CLAYAmounts[sendAddr]);
-                UO(12,sendAddr,retrieve.CLAYAmounts[sendAddr]);
+                uint amount = retrieve.CLAYAmounts[sendAddr];
                 retrieve.CLAYAmounts[sendAddr] = 0;
+                CLAY.transfer(sendAddr,amount);
+                UO(12,sendAddr,amount);
             }
         }
     }
