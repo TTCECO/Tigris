@@ -127,12 +127,9 @@ contract CDSDatabase is PermissionGroups {
     /*get total service fee by CLAY by address */
     function getServiceFee(address _addr) public view returns (uint){
         require(_addr != address(0));
-        uint startTime = generate[_addr].generateTime.add(SECONDS_PER_DAY);
+        uint startTime = generate[_addr].generateTime;
         uint currentserviceFeeRate =0 ;
         uint cTime = timeOffset.add(block.number.mul(3));
-        if (cTime < startTime) {
-            return generate[_addr].preServiceFee;
-        }
         currentserviceFeeRate = serviceFeeRate.getValue(startTime,cTime);
         // cal all stable token to TTC
         uint totalGenerateValue = getCFIATByTTC(generate[_addr].CUSDAmounts,generate[_addr].CCNYAmounts,generate[_addr].CKRWAmounts);
@@ -336,6 +333,39 @@ contract CDSDatabase is PermissionGroups {
 
         delete collateral[_addr];
         delete generate[_addr];
+    }
+
+
+    /*set user collateral info By Admin only used in upgrade */
+    function setCollateralInfoByAdmin(address _address,uint _TTCAmounts, uint _TTCTime, uint _TTCHV,uint _CLAYAmounts,uint _CLAYTime,uint _CLAYHV) onlyAdmin public {
+        require(_address != address(0));
+        CollateralInfo storage collateralInfo = collateral[_address];
+        collateralInfo.TTCAmounts = _TTCAmounts;
+        collateralInfo.TTCTime = _TTCTime;
+        collateralInfo.TTCHV = _TTCHV;
+        collateralInfo.CLAYAmounts = _CLAYAmounts;
+        collateralInfo.CLAYTime = _CLAYTime;
+        collateralInfo.CLAYHV = _CLAYHV;
+    }
+
+    /*set user generate info By Admin only used in upgrade */
+    function setGenerateInfoInfoByAdmin(address _address,uint _CUSDAmounts, uint _CCNYAmounts, uint _CKRWAmounts,uint _preServiceFee,uint _generateTime) onlyAdmin public {
+        require(_address != address(0));
+        GenerateInfo storage  generateInfo = generate[_address];
+        generateInfo.CUSDAmounts = _CUSDAmounts;
+        generateInfo.CCNYAmounts = _CCNYAmounts;
+        generateInfo.CKRWAmounts = _CKRWAmounts;
+        generateInfo.preServiceFee = _preServiceFee;
+        generateInfo.generateTime = _generateTime;
+    }
+    
+    /*set total amounts By Admin only used in upgrade */
+    function seTotalCollateralAmountByAdmin(uint _ctTTC,uint _ctCLAY, uint _debtCUSD, uint _debtCCNY,uint _debtCKRW) onlyAdmin public {
+        ctTTC = _ctTTC;
+        ctCLAY = _ctCLAY;
+        debtCUSD = _debtCUSD;
+        debtCCNY = _debtCCNY;
+        debtCKRW = _debtCKRW;
     }
     
 }
