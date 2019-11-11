@@ -360,7 +360,7 @@ contract CDSDatabase is PermissionGroups {
     }
     
     /*set total amounts By Admin only used in upgrade */
-    function seTotalCollateralAmountByAdmin(uint _ctTTC,uint _ctCLAY, uint _debtCUSD, uint _debtCCNY,uint _debtCKRW) onlyAdmin public {
+    function setTotalCollateralAmountByAdmin(uint _ctTTC,uint _ctCLAY, uint _debtCUSD, uint _debtCCNY,uint _debtCKRW) onlyAdmin public {
         ctTTC = _ctTTC;
         ctCLAY = _ctCLAY;
         debtCUSD = _debtCUSD;
