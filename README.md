@@ -34,4 +34,6 @@ $ truffle test
 
 ```
 
+## License
 
+Tigris smart contract is licensed under the [GNU General Public License v3.0](https://github.com/TTCECO/Tigris/blob/master/LICENSE)
