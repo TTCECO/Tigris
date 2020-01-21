@@ -12,10 +12,11 @@ More Details about Tigris could be found on [Tigris Whitepaper](https://ttceco.g
 
 * The Tigris smart contract list:
 
-  * [CDS](https://github.com/TTCECO/Tigris/blob/master/contracts/CDS.sol) -
-  * [CDSDatabase](https://github.com/TTCECO/Tigris/blob/master/contracts/CDSDatabase.sol) - 
-  * [Oracle](https://github.com/TTCECO/Tigris/blob/master/contracts/Oracle.sol) - 
-  * [CFIAT](https://github.com/TTCECO/Tigris/blob/master/contracts/CFIAT.sol) - 
+  * [CDS](https://github.com/TTCECO/Tigris/blob/master/contracts/CDS.sol) - CDS provides collateralized debt service and TTC staking service. 
+  * [CDSDatabase](https://github.com/TTCECO/Tigris/blob/master/contracts/CDSDatabase.sol) - Database of CDS
+  * [Oracle](https://github.com/TTCECO/Tigris/blob/master/contracts/Oracle.sol) - Access data from outside of TTC network. 
+  * [CFIAT](https://github.com/TTCECO/Tigris/blob/master/contracts/CFIAT.sol) - A series of decentralized TST-20 stablecoins issued.
+on the TTC platform 
 
 ## How to test
 
